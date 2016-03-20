@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+Profile - Medical Record
+{% endblock %}
+
+<!--
+TODO: add view physical exam record (if any)
+TODO: add view laboratory record (if any)
+TODO: add view prescription record (if any)
+TODO: add view diagnosis record (if any)
+-->
+
+{% block page_panel %}
+<div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
+    <h3 class="text-center">
+        <i class="fa fa-list-alt fa-fw fa-1x"></i>
+        &nbsp;Medical Record Detailed Information
+    </h3>
+    <div class="row-fluid vertical-center" style="">
+        <div class="col-xs-6 text-left">
+            <h5 class="text-left">Patient Name:</h5>
+        </div>
+        <div class="col-xs-6 text-right">
+            <h5><a href="{{ medical_record.patient.get_absolute_url }}">{{ medical_record.patient }}</a></h5>
+        </div>
+    </div>
+    <div class="row-fluid vertical-center" style="">
+        <div class="col-xs-6 text-left">
+            <h5>Recorded Date:</h5>
+        </div>
+        <div class="col-xs-6 text-right">
+            {{ medical_record.recorded_date }}
+        </div>
+    </div>
+    <div class="row-fluid vertical-center" style="">
+        <div class="col-xs-6 text-left">
+            <h5>Recorded By:</h5>
+        </div>
+        <div class="col-xs-6 text-right">
+            {{ medical_record.recorded_by }}
+        </div>
+    </div>
+    <div class="row-fluid vertical-center" style="">
+        <div class="col-xs-6 text-left">
+            <h5>Chief Complaint/s:</h5>
+        </div>
+        <div class="col-xs-6 text-right">
+            {% for complaint in complaints %}
+                {{ complaint }} <br>
+            {% empty %}
+                {{ error_message }}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row-fluid vertical-center" style="">
+        <div class="col-xs-6 text-left">
+            <h5>Additional Information:</h5>
+        </div>
+        <div class="col-xs-6 text-right">
+            {{ medical_record.additional_info }}
+        </div>
+    </div>
+    <ul class="nav nav-pills nav-stacked spacer-y-small">
+        <li role="presentation">
+            <a href="{% url 'opd:list_exam' %}?medical={{ medical_record.id }}">
+                <i class="fa fa-heartbeat fa-fw fa-1x"></i>
+                &nbsp;Physical
+                <span class="badge pull-right">{{ physical_exam_count }}</span>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#">
+                <i class="fa fa-flask fa-fw fa-1x"></i>
+                &nbsp;Laboratory
+                <span class="badge pull-right">{{ laboratory_count }}</span>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#">
+                <i class="fa fa-stethoscope fa-fw fa-1x"></i>
+                &nbsp;Diagnosis
+                <span class="badge pull-right">{{ diagnosis_count }}</span>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#">
+                <i class="fa fa-file-text-o fa-fw fa-1x"></i>
+                &nbsp;Prescription
+                <span class="badge pull-right">{{ prescription_count }}</span>
+            </a>
+        </li>
+    </ul>
+</div>
+{% endblock %}

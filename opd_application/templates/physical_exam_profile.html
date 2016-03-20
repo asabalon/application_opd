@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+Physical Exam Profile - {{ patient }}
+{% endblock %}
+
+{% block page_panel %}
+<div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
+    <nav class="container col-xs-12">
+        <ul class="pager">
+            <li class="pull-left"><a href="{{ request.path }}">Previous</a></li>
+            <li class=""><a href="{{ physical_exam.medical_record.get_absolute_url }}">Done</a></li>
+            <li class="pull-right"><a href="{{ request.path }}">Next</a></li>
+        </ul>
+    </nav>
+    <h3 class="text-center">
+        <i class="fa fa-heartbeat fa-fw fa-1x"></i>
+        &nbsp;Physical Exam Detailed Information
+    </h3>
+    <ul class="inline col-xs-12" style="">
+        <li class="pull-left">
+            <h5 class="text-left">Patient Name:</h5>
+        </li>
+        <li class="pull-right">
+            <h5><a href="{{ patient.get_absolute_url }}">{{ patient }}</a></h5>
+        </li>
+    </ul>
+    <ul class="inline col-xs-12" style="">
+        <li class="pull-left">
+            <h5 class="text-left">Recorded Date:</h5>
+        </li>
+        <li class="pull-right">
+            <h6>{{ physical_exam.recorded_date }}</h6>
+        </li>
+    </ul>
+    <ul class="inline col-xs-12" style="">
+        <li class="pull-left">
+            <h5 class="text-left">Recorded By:</h5>
+        </li>
+        <li class="pull-right">
+            <h6>{{ physical_exam.recorded_by }}</h6>
+        </li>
+    </ul>
+    {% for key, details in key_detail_zip %}
+    <ul class="inline col-xs-12" style="">
+        <li class="pull-left">
+            <h5 class="text-left">{{ key }}</h5>
+        </li>
+        <li class="pull-right">
+            {% for detail in details %}
+            <h6>{{ detail }}</h6>
+            {% empty %}
+            {% endfor %}
+        </li>
+    </ul>
+    {% empty %}
+    {% endfor %}
+</div>
+{% endblock %}

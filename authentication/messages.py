@@ -1,0 +1,6 @@
+INVALID_BIRTH_DATE_VALUE = 'Invalid Birth Date Value'
+MIN_AGE_VALUE_ERROR = 'User Must be of Legal Age'
+PASSWORD_MISMATCH = 'Password Value is not equal to Confirm Password Value'
+INACTIVE_USER = 'User is Inactive'
+INVALID_CREDENTIALS = 'Invalid Username and/or Password'
+FAILED_FORM_VALIDATION = 'Form Validation Failure'

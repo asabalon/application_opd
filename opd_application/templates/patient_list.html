@@ -1,0 +1,52 @@
+{% extends 'base_list.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+{{ page_title }} List
+{% endblock %}
+
+
+<!--
+TODO: add pagination for more than 10 search result
+TODO: edit table css
+TODO: add register patient button link
+-->
+
+{% block top_add_link %}
+<div class="col-xs-3">
+</div>
+{% endblock %}
+
+{% block page_sub_panel %}
+<div class="spacer-y-small">
+{% crispy form %}
+</div>
+<table class="spacer-y-small table table-responsive table-bordered table-hover">
+    {% if searches %}
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Last Name</th>
+        <th>First Name</th>
+        <th>Birth Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for patient in searches %}
+    <tr data-href="{{ patient.get_absolute_url }}">
+        <td scope="row">{{ patient.id }}</td>
+        <td>{{ patient.last_name }}</td>
+        <td>{{ patient.first_name }}</td>
+        <td>{{ patient.birth_date }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    {% endif %}
+</table>
+{% endblock %}
+
+{% block bottom_add_link %}
+<div class="col-xs-3">
+</div>
+{% endblock %}

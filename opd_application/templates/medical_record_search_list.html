@@ -1,0 +1,47 @@
+{% extends 'base_list.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+{{ page_title }} List
+{% endblock %}
+
+<!--
+
+-->
+{% block top_add_link %}
+<div class="col-xs-3">
+</div>
+{% endblock %}
+
+{% block page_sub_panel %}
+<div class="spacer-y-small">
+{% crispy form %}
+</div>
+<table class="spacer-y-small table table-responsive table-bordered table-hover">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Patient</th>
+        <th>Encoder</th>
+        <th>Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for medical_record in searches %}
+    <tr data-href="{{ medical_record.get_absolute_url }}">
+        <td scope="row">{{ medical_record.id }}</td>
+        <td>{{ medical_record.patient }}</td>
+        <td>{{ medical_record.recorded_by }}</td>
+        <td>{{ medical_record.recorded_date }}</td>
+    </tr>
+    {% empty %}
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block bottom_add_link %}
+<div class="col-xs-3">
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+INVALID_BIRTH_DATE_VALUE = 'Invalid Birth Date Value'
+INVALID_CONTACT_NUMBER = 'Must be a valid 10-digit Contact Number'
+REQUIRED_CONTACT_NUMBER = 'This field is required'
+NO_PATIENT_SELECTED_ = 'Cannot perform operation without Selected Patient'
+INVALID_SEARCH_TYPE = 'Invalid Search Type Parameter'

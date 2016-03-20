@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+Physical Exam List - {{ patient }}
+{% endblock %}
+
+<!--
+
+-->
+
+{% block page_panel %}
+<script type="text/javascript" src="{% static 'custom/jquery/base_list.js' %}"></script>
+<div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
+    <nav class="container col-xs-12">
+        <ul class="pager">
+            <li class="pull-left"><a href="{{ request.path }}">Previous</a></li>
+            <li class="pull-right"><a href="{% url 'opd:home' %}">Next</a></li>
+        </ul>
+    </nav>
+    <a href="{% url 'opd:record_exam' %}?medical={{ physical_exam.medical_record.id }}" role="button"
+       class="btn btn-primary pull-right">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add
+    </a>
+    <table class="spacer-y-small table table-responsive table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Patient</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for physical_exam in physical_exams %}
+        <tr data-href="{{ physical_exam.get_absolute_url }}">
+            <td scope="row">{{ physical_exam.id }}</td>
+            <td>{{ physical_exam.medical_record.patient }}</td>
+            <td>{{ physical_exam.recorded_date }}</td>
+        </tr>
+        {% empty %}
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'opd:record_exam' %}?medical={{ medical_record.id }}" role="button"
+       class="btn btn-primary pull-right">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add
+    </a>
+</div>
+{% endblock %}

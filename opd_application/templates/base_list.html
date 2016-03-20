@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+{{ page_title }} List - {{ patient }}
+{% endblock %}
+
+<!--
+
+-->
+
+{% block page_panel %}
+<script src="{% static 'custom/js/dashboard.js' %}"></script>
+<script type="text/javascript" src="{% static 'custom/jquery/base_list.js' %}"></script>
+<div class="col-xs-12 col-md-12 col-lg-offset-2 col-lg-8">
+    {% block nav_links %}
+    {% endblock %}
+
+    <div class="row-fluid vertical-center">
+        <div class="col-xs-9">
+            <div class="row-fluid">
+                <i class="col-xs-3 fa fa-fw fa-2x {{ page_icon }}"></i>
+                <h3 class="col-xs-offset-3">{{ page_title }}</h3>
+            </div>
+        </div>
+        {% block top_add_link %}
+        {% endblock %}
+    </div>
+
+    {% block patient %}
+    {% endblock %}
+
+    {% block page_sub_panel %}
+    {% endblock %}
+
+    <div class="row-fluid vertical-center">
+        <div class="col-xs-9">
+            <nav class="pull-left">
+                <ul class="pagination">
+                    <li class="{{ previous_link_class }}">
+                        {% if previous_link %}
+                        <a href="{{ previous_link }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                        {% else %}
+                        <span aria-hidden="true">&laquo;</span>
+                        {% endif %}
+                    </li>
+                    <li class="active"><a href="#">{{ current_page }}<span class="sr-only">(current)</span></a></li>
+                    <li class="{{ next_link_class }}">
+                        {% if next_link %}
+                        <a href="{{ next_link }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                        {% else %}
+                        <span aria-hidden="true">&raquo;</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% block bottom_add_link %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

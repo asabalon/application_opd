@@ -15,12 +15,16 @@ TODO: add retrieval of patient picture
 <div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
     <div class="col-xs-6">
         <div class="text-center" style="margin-bottom:1.5em">
-            {% if patient.sex == 'F' %}
+            {% if patient.photo %}
+            <img src="{{ patient.photo.url }}" class="avatar img-circle img-thumbnail" alt="avatar">
+            {% elif patient.sex == 'F' %}
             <img src="{% static 'images/female-default.jpg' %}" class="avatar img-circle img-thumbnail" alt="avatar">
             {% else %}
             <img src="{% static 'images/male-default.jpg' %}" class="avatar img-circle img-thumbnail" alt="avatar">
             {% endif %}
-            <span class="container">{{ patient }}</span>
+            <div class="spacer-y-small">
+                <span>{{ patient }}</span>
+            </div>
         </div>
         <div class="list-group">
             <a class="list-group-item" href="{% url 'opd:list_medical' %}?patient={{ patient.id }}">
@@ -38,11 +42,17 @@ TODO: add retrieval of patient picture
         </div>
     </div>
     <div class="col-xs-6">
-        <div class="row-fluid vertical-center">
+        <div class="col-xs-12 spacer-y-small">
+            <a href="{{ edit_link }}" role="button"
+               class="btn btn-primary pull-right" name="bottom">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>Edit
+            </a>
+        </div>
+        <div class="row vertical-center">
             <i class="fa fa-user fa-2x"></i>&nbsp;
             <h4 class="text-center pull-right">Personal Information</h4>
         </div>
-        <span class="container row">
+        <span class="row">
             <div class="col-xs-3">
                 <i class="fa fa-venus-mars fa-fw fa-2x"></i>
             </div>
@@ -50,7 +60,7 @@ TODO: add retrieval of patient picture
                 <div>{{ sex }} ({{ marital_status }})</div>
             </div>
         </span>
-        <span class="container row">
+        <span class="row">
             <div class="col-xs-3">
                 <i class="fa fa-birthday-cake fa-fw fa-2x"></i>
             </div>
@@ -58,7 +68,7 @@ TODO: add retrieval of patient picture
                 <div>{{ patient.birth_date }}</div>
             </div>
         </span>
-        <span class="container row">
+        <span class="row">
             <div class="col-xs-3">
                 <i class="fa fa-home fa-fw fa-2x"></i>
             </div>
@@ -75,7 +85,7 @@ TODO: add retrieval of patient picture
             </div>
         </span>
         {% if patient.address_country == 'PH' %}
-        <span class="container row">
+        <span class="row">
             <div class="col-xs-3">
                 <i class="fa fa-home fa-fw fa-2x"></i>
             </div>
@@ -85,7 +95,7 @@ TODO: add retrieval of patient picture
         </span>
         {% endif %}
         {% if patient.referred_by %}
-        <span class="container row">
+        <span class="row">
             <div class="col-xs-3">
                 <i class="fa fa-user-md fa-fw fa-2x"></i>
             </div>

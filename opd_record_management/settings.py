@@ -11,10 +11,9 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
+import os, datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -25,8 +24,7 @@ SECRET_KEY = 'r&umy0t78%68+_5jy)audf^47z#%1xk*66m)ay-cb1i#i3v$kx'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -84,13 +82,17 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'opd_record_management.wsgi.application'
+MEDIA_URL = '/media/'
 
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media')
+
+WSGI_APPLICATION = 'opd_record_management.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -103,7 +105,6 @@ DATABASES = {
         }
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -124,3 +125,120 @@ LOGIN_REDIRECT_URL = '/opd/home'
 
 # Crispy Forms Required Constants
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+# Logging Settings
+LOGGING = {
+    # Logging Schema Version (current value is limited to 1)
+    'version': 1,
+    # Set to False To Avoid Disabling Default Loggers
+    'disable_existing_loggers': False,
+    # Dictionaries for Logging Format
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(message)s',
+            'datefmt': '%m/%d/%Y %I:%M:%S %p',
+        },
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s',
+            'datefmt': '%m/%d/%Y %I:%M:%S %p',
+        },
+        'verbose_db': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(sql)s %(params)s %(duration)d %(message)s',
+            'datefmt': '%m/%d/%Y %I:%M:%S %p',
+        },
+    },
+    # Filters for Rejecting or Accepting Log Records
+    'filters': {
+        # Allows Log Records if DEBUG = TRUE
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        # Allows Log Records if DEBUG = FALSE
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    # Handles Output of Log Records
+    'handlers': {
+        # DEBUG - CRITICAL (DEBUG = TRUE/FALSE)
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(os.path.dirname(BASE_DIR),
+                                     "logs/" + datetime.date.today().strftime('%d%m%Y') + '-opd.log'),
+            'formatter': 'verbose',
+            'maxBytes': 1024,
+        },
+        # DEBUG - CRITICAL (DEBUG = TRUE)
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'filters': ['require_debug_true'],
+            'formatter': 'simple'
+        },
+        # ERROR - CRITICAL (DEBUG = FALSE)
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
+            'formatter': 'verbose'
+        }
+    },
+    # Different Loggers
+    'loggers': {
+        'django': {
+            'level': 'DEBUG',
+            'filters': [],
+            'handlers': ['console', 'file'],
+            'propagate': True,
+        },
+        'django.request': {
+            'level': 'WARNING',
+            'filters': [],
+            'handlers': ['mail_admins', 'file'],
+            'propagate': False,
+        },
+        'django.template': {
+            'level': 'DEBUG',
+            'filters': [],
+            'handlers': ['console', 'file'],
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'filters': [],
+            'handlers': ['console', 'file'],
+            'propagate': False,
+        },
+        'django.security': {
+            'level': 'WARNING',
+            'filters': [],
+            'handlers': ['mail_admins', 'file'],
+            'propagate': False,
+        },
+        'opd_application': {
+            'level': 'DEBUG',
+            'filters': [],
+            'handlers': ['console', 'mail_admins', 'file'],
+            'propagate': False,
+        }
+    }
+}
+
+# EMail Settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'opd.application@gmail.com'
+EMAIL_HOST_PASSWORD = 'opdapplication'
+EMAIL_SUBJECT_PREFIX = 'OPD-'
+EMAIL_USE_TLS = True
+
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+ADMINS = (
+    ('ASAbalon', 'asabalon@gmail.com'),
+)
+
+MANAGERS = ADMINS

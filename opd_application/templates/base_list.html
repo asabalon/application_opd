@@ -3,7 +3,6 @@
 {% load crispy_forms_tags %}
 
 {% block page_title %}
-{{ page_title }} List - {{ patient }}
 {% endblock %}
 
 <!--
@@ -11,7 +10,7 @@
 -->
 
 {% block page_panel %}
-<script src="{% static 'custom/js/dashboard.js' %}"></script>
+<script src="{% static 'custom/js/search.js' %}"></script>
 <script type="text/javascript" src="{% static 'custom/jquery/base_list.js' %}"></script>
 <div class="col-xs-12 col-md-12 col-lg-offset-2 col-lg-8">
     {% block nav_links %}
@@ -34,6 +33,7 @@
     {% block page_sub_panel %}
     {% endblock %}
 
+    {% if searches %}
     <div class="row-fluid vertical-center">
         <div class="col-xs-9">
             <nav class="pull-left">
@@ -47,7 +47,13 @@
                         <span aria-hidden="true">&laquo;</span>
                         {% endif %}
                     </li>
-                    <li class="active"><a href="#">{{ current_page }}<span class="sr-only">(current)</span></a></li>
+                    {% for page in pages %}
+                    {% if page == current_page %}
+                    <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
+                    {% else %}
+                    <li><a href="{{ search_link }}{{ page }}">{{ page }}</a></li>
+                    {% endif %}
+                    {% endfor %}
                     <li class="{{ next_link_class }}">
                         {% if next_link %}
                         <a href="{{ next_link }}" aria-label="Next">
@@ -63,5 +69,6 @@
         {% block bottom_add_link %}
         {% endblock %}
     </div>
+    {% endif %}
 </div>
 {% endblock %}

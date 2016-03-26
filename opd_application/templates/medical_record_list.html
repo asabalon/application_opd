@@ -49,6 +49,7 @@
 {% endblock %}
 
 {% block page_sub_panel %}
+{% if searches%}
 <table class="spacer-y-small table table-responsive table-bordered table-hover">
     <thead>
     <tr>
@@ -58,7 +59,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for medical_record in medical_records %}
+    {% for medical_record in searches %}
     <tr data-href="{{ medical_record.get_absolute_url }}">
         <td scope="row">{{ medical_record.id }}</td>
         <td>{{ medical_record.recorded_by }}</td>
@@ -68,6 +69,11 @@
     {% endfor %}
     </tbody>
 </table>
+{% else %}
+<div class="alert alert-danger">
+    {{ error_message }}
+</div>
+{% endif %}
 {% endblock %}
 
 {% block bottom_add_link %}

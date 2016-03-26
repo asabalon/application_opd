@@ -1,44 +1,54 @@
-from authentication import messages, constants
+import logging
+
 from bootstrap3_datetime.widgets import DateTimePicker
-from crispy_forms.bootstrap import FormActions, InlineCheckboxes, Div, InlineField
+from crispy_forms.bootstrap import FormActions, Div, InlineField, PrependedAppendedText, Field
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, Reset, Button, HTML
+from crispy_forms.layout import Layout, Fieldset, Submit, Reset, HTML, Button
 from datetime import timedelta
 from django import forms
 from django_countries.widgets import CountrySelectWidget
 from django.utils.timezone import localtime, now
-from opd_application import messages
 
+from .constants import *
+from .messages import *
 from .models import *
 
-class GeneralSearchForm(forms.Form):
-    search_type = forms.CharField(max_length=1, required=True,
-                                  widget=forms.HiddenInput(
-                                      attrs={'name': 'search_type', 'id': 'search_type'}))
-    search_param = forms.CharField(max_length=100, required=False, widget=InlineField(
-            attrs={'name': 'search_param', 'id': 'search_param', 'class': 'form-control'}))
+# TODO: Separate forms into different files
 
-    def __init__(self, placeholder, search_link, search_type_value, *args, **kwargs):
+logger = logging.getLogger(__name__)
+
+
+class GeneralSearchForm(forms.Form):
+    # search_type value determines what kind of search to be made
+    search_type = forms.CharField(max_length=1, required=True,
+                                  widget=forms.HiddenInput(attrs={'name': 'search_type', 'value': DEFAULT_SEARCH_TYPE}))
+
+    # search_param value is used to make queries depending on search_type value
+    search_param = forms.CharField(max_length=100, required=False, widget=InlineField(
+        attrs={'name': 'search_param'}), label='')
+
+    def __init__(self, placeholder, form_action, act_search_type_label_var_name,
+                 search_key_values_var_name, *args, **kwargs):
         super(GeneralSearchForm, self).__init__(*args, **kwargs)
-        self.fields['search_param'].label = ''
+
         self.fields['search_param'].widget.attrs['placeholder'] = placeholder
-        self.fields['search_type'].widget.attrs['value'] = search_type_value
 
         self.helper = FormHelper()
         self.helper.form_method = 'POST'
-        self.helper.form_action = search_link
+        self.helper.form_action = form_action
         self.helper.layout = Layout(
             Div(
                 Div(
                     Submit('submit', 'Search', css_class='btn'),
-                    HTML("""
+                    HTML
+                    ("""
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
-                            <span id="search_type_label">{{ label }}</span>
+                            <span id="search_type_label">{{""" + act_search_type_label_var_name + """}}</span>
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            {% for key, value in search_label.items %}
+                            {% for key, value in """ + search_key_values_var_name + """.items %}
                             <li><a href="#" onclick="change_search_type('{{ key }}', '{{ value }}')">{{ value }}</a></li>
                             {% empty %}
                             <li>NONE</li>
@@ -54,63 +64,18 @@ class GeneralSearchForm(forms.Form):
     def clean_search_type(self):
         search_type = self.cleaned_data['search_type']
 
-        if int(search_type) not in [1, 2, 3]:
-            raise forms.ValidationError(messages.INVALID_SEARCH_TYPE)
+        if search_type not in VALID_SEARCH_TYPES:
+            logger.exception('Invalid search_type value passed.')
+            raise forms.ValidationError(INVALID_SEARCH_TYPE)
         else:
-            return search_type
-
-
-class PatientSearchForm(forms.Form):
-    search_type = forms.CharField(max_length=1, required=True,
-                                  widget=forms.HiddenInput(
-                                      attrs={'name': 'search_type', 'id': 'search_type', 'value': 1}))
-    search_param = forms.CharField(max_length=100, required=False, widget=InlineField(
-        attrs={'name': 'search_param', 'id': 'search_param', 'class': 'form-control', 'placeholder': 'Search Patient'}))
-
-    helper = FormHelper()
-    helper.form_method = 'POST'
-    helper.form_action = reverse_lazy('opd:search_patient')
-    helper.layout = Layout(
-        Div(
-            Div(
-                Submit('submit', 'Search', css_class='btn'),
-                HTML("""
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                        <span id="search_type_label">{{ label }}</span>
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        {% for key, value in search_label.items %}
-                        <li><a href="#" onclick="change_search_type('{{ key }}', '{{ value }}')">{{ value }}</a></li>
-                        {% empty %}
-                        <li>NONE</li>
-                        {% endfor %}
-                    </ul>
-                """),
-                css_class='input-group-btn'),
-            'search_param',
-            css_class='input-group'),
-        'search_type',
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(PatientSearchForm, self).__init__(*args, **kwargs)
-        self.fields['search_param'].label = ''
-
-    def clean_search_type(self):
-        search_type = self.cleaned_data['search_type']
-
-        if int(search_type) not in [1, 2, 3]:
-            raise forms.ValidationError(messages.INVALID_SEARCH_TYPE)
-        else:
+            logger.info('Valid search_type value passed.')
             return search_type
 
 
 class PatientForm(forms.ModelForm):
     contact_number = forms.RegexField(
         regex=r'^\d{10}$',
-        error_messages={'invalid': messages.INVALID_CONTACT_NUMBER, 'required': messages.REQUIRED_CONTACT_NUMBER}
+        error_messages={'invalid': INVALID_CONTACT_NUMBER, 'required': REQUIRED_CONTACT_NUMBER}
     )
 
     helper = FormHelper()
@@ -119,6 +84,7 @@ class PatientForm(forms.ModelForm):
     helper.layout = Layout(
         Fieldset(
             'Patient Registration',
+            'photo',
             'first_name',
             'middle_name',
             'last_name',
@@ -142,6 +108,7 @@ class PatientForm(forms.ModelForm):
     class Meta:
         model = Patient
         fields = [
+            'photo',
             'first_name',
             'middle_name',
             'last_name',
@@ -173,7 +140,7 @@ class PatientForm(forms.ModelForm):
         current_date = localtime(now()).date()
 
         if (sent_date - current_date) > timedelta(seconds=1):
-            raise forms.ValidationError(messages.INVALID_BIRTH_DATE_VALUE)
+            raise forms.ValidationError(INVALID_BIRTH_DATE_VALUE)
         else:
             return sent_date
 
@@ -184,6 +151,35 @@ class PatientForm(forms.ModelForm):
         self.fields['address_city'].label = 'City/Municipality'
         self.fields['address_province'].label = 'Province'
         self.fields['address_postal'].label = 'Postal/Zip Code'
+
+
+class PatientEditForm(PatientForm):
+    helper = FormHelper()
+    helper.form_method = "POST"
+    helper.form_action = ''
+    helper.layout = Layout(
+        Fieldset(
+            'Patient Update',
+            'photo',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'birth_date',
+            'sex',
+            'marital_status',
+            'address_street',
+            'address_district',
+            'address_city',
+            'address_province',
+            'address_postal',
+            'address_country',
+            'contact_number',
+        ),
+        FormActions(
+            Submit('submit', 'Save Changes', css_class='btn btn-primary'),
+            Reset('reset', 'Clear', css_class='btn btn-default'),
+        )
+    )
 
 
 class PhysicalExamForm(forms.Form):
@@ -326,3 +322,23 @@ class MedicalRecordForm(forms.ModelForm):
         super(MedicalRecordForm, self).__init__(*args, **kwargs)
         self.fields['complaint'].label = "Chief Complaint"
         self.fields['additional_info'].label = "Additional Information"
+
+
+class MedicalRecordEditForm(MedicalRecordForm):
+    helper = FormHelper()
+    helper.form_method = "POST"
+    helper.form_action = ''
+    helper.form_class = 'form-horizontal'
+    helper.layout = Layout(
+        Fieldset(
+            'Medical Record Update',
+        ),
+        'patient_name',
+        'patient',
+        'complaint',
+        'additional_info',
+        FormActions(
+            Submit('submit', 'Save Changes', css_class='btn btn-primary'),
+            Reset('reset', 'Clear', css_class='btn btn-default'),
+        )
+    )

@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import Complaint, EENTChoice, LungChoice, RhythmChoice, AbdomenChoice, ExtremitiesChoice, RateChoice, \
-    PhysicalExamKey
+from .models import *
 
 
 @admin.register(Complaint)
@@ -40,5 +39,24 @@ class ExtremitiesChoiceAdmin(admin.ModelAdmin):
 
 
 @admin.register(PhysicalExamKey)
-class PhysicalExamKeysAdmin(admin.ModelAdmin):
+class PhysicalExamKeyAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(MedicalHistoryCategory)
+class MedicalHistoryCategoryAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(MedicalHistoryCategoryUnit)
+class MedicalHistoryCategoryUnitAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(MedicalHistoryCategoryDetail)
+class MedicalHistoryCategoryDetailAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(MedicalHistoryCategoryDetailKey)
+class MedicalHistoryCategoryDetailKeyAdmin(admin.ModelAdmin):
     pass

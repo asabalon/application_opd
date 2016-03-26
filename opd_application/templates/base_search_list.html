@@ -27,18 +27,18 @@ TODO: add register patient button link
     <thead>
     <tr>
         <th>ID</th>
-        <th>Last Name</th>
-        <th>First Name</th>
-        <th>Birth Date</th>
+        <th>Patient</th>
+        <th>Encoder</th>
+        <th>Recorded Date</th>
     </tr>
     </thead>
     <tbody>
-    {% for patient in searches %}
-    <tr data-href="{{ patient.get_absolute_url }}">
-        <td scope="row">{{ patient.id }}</td>
-        <td>{{ patient.last_name }}</td>
-        <td>{{ patient.first_name }}</td>
-        <td>{{ patient.birth_date }}</td>
+    {% for record in searches %}
+    <tr data-href="{{ record.get_absolute_url }}">
+        <td scope="row">{{ record.id }}</td>
+        <td>{{ record.patient }}</td>
+        <td>{{ record.recorded_by }}</td>
+        <td>{{ record.recorded_date }}</td>
     </tr>
     {% empty %}
     {% endfor %}

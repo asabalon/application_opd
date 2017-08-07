@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+Diagnosis Form - {{ medical_record.patient }}
+{% endblock %}
+
+{% block page_panel %}
+<div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
+    <form class="form-horizontal" method="post">
+        <fieldset>
+            <legend>
+                Diagnosis Record
+                {% if diagnosis %}
+                    Update
+                {% else %}
+                    Creation
+                {% endif %}
+            </legend>
+        </fieldset>
+        <div class="form-group">
+            <label for="patient_name" class="control-label">
+                Patient Name
+            </label>
+            <div class="controls ">
+                <input class="textinput textInput form-control" id="patient_name"
+                       maxlength="100" name="patient_name" readonly="readonly" type="text"
+                       value="{{ medical_record.patient }}"/>
+            </div>
+        </div>
+        <input id="medical_record" name="medical_record" type="hidden" value="{{ medical_record.id }}"/>
+        {% if diagnosis %}
+            <input id="diagnosis" name="diagnosis" type="hidden" value="{{ diagnosis.id }}"/>
+        {% else %}
+        {% endif %}
+        {{ formset.management_form|crispy }}
+        {% for form in formset %}
+            {% crispy form %}
+        {% endfor %}
+        <div class="form-group">
+            <div class="controls ">
+                <input type="submit" name="submit" value="{{ submit_label }}" class="btn btn-primary"
+                       id="submit-id-submit"/>
+                <input type="reset" name="reset" value="Clear" class="btn btn-inverse btn btn-default"
+                       id="reset-id-reset"/>
+                <input type="submit" name="cancel" value="Cancel" class="btn btn-default" id="submit-id-cancel"/>
+            </div>
+        </div>
+    </form>
+    <script type="text/javascript">
+        format_textarea();
+    </script>
+</div>
+{% endblock %}

@@ -1,14 +1,23 @@
+import logging
+
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.utils.timezone import localtime, now
 from django.views.generic import FormView, ListView, DetailView
 
 from opd_application.constants import *
-from opd_application.forms import MedicalRecordForm, MedicalRecordEditForm
-from opd_application.models import MedicalRecord, PhysicalExam, Laboratory, Diagnosis, Prescription, Patient
-from opd_application.views.general_views import GeneralSearchListView, calculate_offset, modify_page_links, \
-    validate_response
+from opd_application.forms.medical_record_forms import MedicalRecordForm, MedicalRecordEditForm
+from opd_application.models.medical_record_models import MedicalRecord
+from opd_application.models.physical_exam_models import PhysicalExam
+from opd_application.models.models import Patient
+from opd_application.models.prescription_models import Prescription
+from opd_application.models.diagnosis_models import Diagnosis
+from opd_application.models.laboratory_models import Laboratory
+from opd_application.views.general_views import GeneralSearchListView, GeneralListView
+
+logger = logging.getLogger(__name__)
 
 
 class MedicalRecordFormView(FormView):
@@ -68,79 +77,36 @@ class MedicalRecordDetailView(DetailView):
         return super(MedicalRecordDetailView, self).dispatch(request, *args, **kwargs)
 
 
-class MedicalRecordListView(ListView):
-    model = MedicalRecord
-    template_name = MEDICAL_RECORD_LIST_TEMPLATE
+class MedicalRecordListView(GeneralListView):
+    """
+    View for displaying all patient's physical exam record information for a specific medical record. Uses only GET
+    function to display all physical exam records for chosen medical record. Extends GeneralListView.
+    """
 
-    pages = []
-    searches = []
-    current_page = 1
-    search_link = ''
-    search_count = 0
-    error_message = ''
-
-    next_link = ''
-    next_link_class = ''
-    previous_link = ''
-    previous_link_class = ''
-
-    def get(self, request, *args, **kwargs):
-        if request.GET.get('patient'):
-            patient = Patient.objects.get(pk=request.GET.get('patient'))
-
-            added_offset = calculate_offset(self, request)
-
-            query_set = MedicalRecord.objects.filter(patient=patient).order_by('-recorded_date')
-
-            self.search_count = query_set.count()
-            self.searches = query_set[0 + added_offset:MAX_LIST_ITEMS_PER_PAGE + added_offset + 1]
-            self.search_link = reverse_lazy(MEDICAL_RECORD_LIST_PAGE_NAME) + '?patient=' + str(
-                patient.id) + '&current='
-
-            modify_page_links(self)
-            validate_response(self)
-
-            return render(request, self.template_name,
-                          {'searches': self.searches[0:MAX_LIST_ITEMS_PER_PAGE],
-                           'patient': patient,
-                           'pages': self.pages,
-                           'error_message': self.error_message,
-                           'search_link': self.search_link,
-                           'left_link': patient.get_absolute_url(),
-                           'left_link_icon': PATIENT_PAGE_ICON,
-                           'left_link_name': 'Patient Profile',
-                           'right_link': '',
-                           'right_link_icon': MEDICAL_HISTORY_PAGE_ICON,
-                           'right_link_name': 'Patient History',
-                           'page_title': 'Medical Records',
-                           'page_icon': MEDICAL_RECORD_PAGE_ICON,
-                           'add_link': reverse_lazy(MEDICAL_RECORD_FORM_PAGE_NAME) + '?patient=' + str(patient.id),
-                           'current_page': self.current_page,
-                           'next_link': self.next_link,
-                           'next_link_class': self.next_link_class,
-                           'previous_link': self.previous_link,
-                           'previous_link_class': self.previous_link_class,
-                           })
-        else:
-            return redirect(DASHBOARD_PAGE_NAME, permanent=True)
-
-    @method_decorator(login_required(login_url=LOGIN_PAGE_NAME))
-    def dispatch(self, request, *args, **kwargs):
-        return super(MedicalRecordListView, self).dispatch(request, *args, **kwargs)
+    def __init__(self):
+        logger.info('Instantiating GenaralListView super class')
+        super(MedicalRecordListView, self).__init__(model=MedicalRecord,
+                                                    template_name=MEDICAL_RECORD_LIST_TEMPLATE,
+                                                    add_page_name=MEDICAL_RECORD_FORM_PAGE_NAME,
+                                                    left_link_page_name=None,
+                                                    left_link_name=None,
+                                                    left_link_icon=None,
+                                                    right_link_page_name=None,
+                                                    right_link_name=None,
+                                                    right_link_icon=None,
+                                                    page_icon=MEDICAL_RECORD_PAGE_ICON,
+                                                    page_title='Medical Record Results',
+                                                    list_page_name=MEDICAL_RECORD_LIST_PAGE_NAME)
 
 
 class MedicalRecordSearchListView(GeneralSearchListView):
     def __init__(self, **kwargs):
         super(MedicalRecordSearchListView, self).__init__(MedicalRecord, MEDICAL_RECORD_PAGE_ICON,
                                                           'Medical Records',
-                                                          reverse_lazy(MEDICAL_RECORD_SEARCH_LIST_PAGE_NAME),
+                                                          MEDICAL_RECORD_SEARCH_LIST_PAGE_NAME,
                                                           MEDICAL_RECORD_SEARCH_LIST_TEMPLATE,
                                                           GENERAL_SEARCH_TYPE_LABEL,
                                                           **kwargs)
-
-    @method_decorator(login_required(login_url=LOGIN_PAGE_NAME))
-    def dispatch(self, request, *args, **kwargs):
-        return super(MedicalRecordSearchListView, self).dispatch(request, *args, **kwargs)
 
 
 class MedicalRecordEditFormView(FormView):

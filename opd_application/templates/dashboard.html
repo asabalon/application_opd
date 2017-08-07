@@ -8,7 +8,6 @@ Dashboard - Home
 
 
 {% block page_panel %}
-<script src="{% static 'custom/js/search.js' %}"></script>
 <div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
     {% if success_message %}
     <div class="alert alert-success">
@@ -23,23 +22,27 @@ Dashboard - Home
 
     {% crispy form %}
 
+    <script type="text/javascript">
+        search_onload_function();
+    </script>
+
     {% block page_sub_panel %}
     <ul class="nav nav-pills nav-stacked spacer-y-medium">
         {% for icon, label in icons_labels_zip %}
-        {% if forloop.counter == search_category %}
-        <li role="presentation" class="text-center active disabled">
-            <a href="#">
-        {% else %}
-        <li role="presentation" class="text-center">
-            <a href="{{ view_link }}?search_category={{ forloop.counter }}">
-        {% endif %}
+            {% if forloop.counter == search_category %}
+            <li role="presentation" class="text-center active disabled">
+                <a href="#">
+            {% else %}
+            <li role="presentation" class="text-center">
+                <a href="{{ view_link }}{{ search_category_param }}{{ forloop.counter }}">
+            {% endif %}
                 <i class="fa {{ icon }} fa-fw fa-1x"></i>
                 &nbsp;Search {{ label }}
             </a>
         </li>
         {% endfor %}
         <li role="presentation" class="text-center" style="margin-top:10em">
-            <a href="{% url 'opd:record_patient' %}">
+            <a href="{{ add_link }}">
                 <i class="fa fa-plus fa-fw fa-1x"></i>
                 &nbsp;Register Patient
             </a>

@@ -1,16 +1,24 @@
+import collections
+import logging
+
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.utils.timezone import localtime, now
 from django.views.generic import FormView, ListView, DetailView
 
-from opd_application.constants import *
-from opd_application.forms import PhysicalExamForm
-from opd_application.models import PhysicalExam, MedicalRecord, PhysicalExamKey, PhysicalExamDetail
-from opd_application.views.general_views import GeneralSearchListView, calculate_offset, modify_page_links, \
-    validate_response
+from opd_application.constants import PHYSICAL_EXAM_FORM_PAGE_NAME, PHYSICAL_EXAM_FORM_TEMPLATE, DASHBOARD_PAGE_NAME, \
+    PHYSICAL_EXAM_PROFILE_TEMPLATE, PHYSICAL_EXAM_LIST_PAGE_NAME, PHYSICAL_EXAM_PAGE_ICON, \
+    PHYSICAL_EXAM_PROFILE_PAGE_NAME, PHYSICAL_EXAM_LIST_TEMPLATE, PHYSICAL_EXAM_SEARCH_LIST_PAGE_NAME, \
+    PHYSICAL_EXAM_SEARCH_LIST_TEMPLATE, LOGIN_PAGE_NAME, GENERAL_SEARCH_TYPE_LABEL, PRESCRIPTION_LIST_PAGE_NAME, \
+    PRESCRIPTION_PAGE_ICON, LABORATORY_PAGE_ICON, LABORATORY_LIST_PAGE_NAME
+from opd_application.forms.physical_exam_forms import PhysicalExamForm
+from opd_application.models.physical_exam_models import PhysicalExam, MedicalRecord, PhysicalExamKey, PhysicalExamDetail
+from opd_application.views.general_views import GeneralSearchListView, modify_page_links, \
+    validate_response, GeneralListView
 
-import collections
+logger = logging.getLogger(__name__)
 
 
 class PhysicalExamFormView(FormView):
@@ -81,9 +89,23 @@ class PhysicalExamDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         physical_exam = self.model.objects.get(pk=kwargs.get('id'))
+        next_exam_record = self.model.objects.filter(medical_record=physical_exam.medical_record,
+                                                     id__gt=physical_exam.id).order_by('id').first()
+        prev_exam_record = self.model.objects.filter(medical_record=physical_exam.medical_record,
+                                                     id__lt=physical_exam.id).order_by('-id').first()
+
         keys = list(PhysicalExamKey.objects.all().order_by('id'))
         key_list = []
         detail_list = []
+        link_dict = {}
+
+        if next_exam_record is not None:
+            link_dict.update(
+                {'next_link': reverse_lazy(PHYSICAL_EXAM_PROFILE_PAGE_NAME, kwargs={'id': str(next_exam_record.id)})})
+        if prev_exam_record is not None:
+            link_dict.update(
+                {'prev_link': reverse_lazy(PHYSICAL_EXAM_PROFILE_PAGE_NAME, kwargs={'id': str(prev_exam_record.id)})})
+
         for key in keys:
             key_list.append(key.display_value)
             value_list = []
@@ -97,86 +119,42 @@ class PhysicalExamDetailView(DetailView):
 
         return render(request, self.template_name,
                       {'physical_exam': physical_exam, 'patient': physical_exam.medical_record.patient,
-                       'key_detail_zip': key_detail_zip})
+                       'key_detail_zip': key_detail_zip, 'link_dict': link_dict})
 
     @method_decorator(login_required(login_url=LOGIN_PAGE_NAME))
     def dispatch(self, request, *args, **kwargs):
         return super(PhysicalExamDetailView, self).dispatch(request, *args, **kwargs)
 
 
-class PhysicalExamListView(ListView):
-    model = PhysicalExam
-    template_name = PHYSICAL_EXAM_LIST_TEMPLATE
+class PhysicalExamListView(GeneralListView):
+    """
+    View for displaying all patient's physical exam record information for a specific medical record. Uses only GET
+    function to display all physical exam records for chosen medical record. Extends GeneralListView.
+    """
 
-    pages = []
-    searches = []
-    current_page = 1
-    search_link = ''
-    search_count = 0
-    error_message = ''
-
-    next_link = ''
-    next_link_class = ''
-    previous_link = ''
-    previous_link_class = ''
-
-    def get(self, request, *args, **kwargs):
-        if request.GET.get('medical'):
-            medical_record = MedicalRecord.objects.get(pk=request.GET.get('medical'))
-
-            added_offset = calculate_offset(self, request)
-
-            query_set = self.model.objects.filter(medical_record=medical_record).order_by('recorded_date')
-
-            self.search_count = query_set.count()
-            self.searches = query_set[0 + added_offset:MAX_LIST_ITEMS_PER_PAGE + added_offset + 1]
-            self.search_link = reverse_lazy(MEDICAL_RECORD_LIST_PAGE_NAME) + '?medical=' + str(
-                medical_record.id) + '&current='
-
-            modify_page_links(self)
-            validate_response(self)
-
-            return render(request, self.template_name,
-                          {'searches': self.searches[0:MAX_LIST_ITEMS_PER_PAGE],
-                           'patient': medical_record.patient,
-                           'pages': self.pages,
-                           'error_message': self.error_message,
-                           'search_link': self.search_link,
-                           'left_link': medical_record.get_absolute_url(),
-                           'left_link_icon': MEDICAL_RECORD_PAGE_ICON,
-                           'left_link_name': 'Medical Record',
-                           'right_link': '',
-                           'right_link_icon': LABORATORY_PAGE_ICON,
-                           'right_link_name': 'Laboratory Results',
-                           'page_title': 'Physical Exams',
-                           'page_icon': PHYSICAL_EXAM_PAGE_ICON,
-                           'add_link': reverse_lazy(PHYSICAL_EXAM_FORM_PAGE_NAME) + '?medical=' + str(
-                               medical_record.id),
-                           'current_page': self.current_page,
-                           'next_link': self.next_link,
-                           'next_link_class': self.next_link_class,
-                           'previous_link': self.previous_link,
-                           'previous_link_class': self.previous_link_class,
-                           })
-        else:
-            return redirect(DASHBOARD_PAGE_NAME, permanent=True)
-
-    @method_decorator(login_required(login_url=LOGIN_PAGE_NAME))
-    def dispatch(self, request, *args, **kwargs):
-        return super(PhysicalExamListView, self).dispatch(request, *args, **kwargs)
+    def __init__(self):
+        logger.info('Instantiating GenaralListView super class')
+        super(PhysicalExamListView, self).__init__(model=PhysicalExam,
+                                                   template_name=PHYSICAL_EXAM_LIST_TEMPLATE,
+                                                   add_page_name=PHYSICAL_EXAM_FORM_PAGE_NAME,
+                                                   left_link_page_name=PRESCRIPTION_LIST_PAGE_NAME,
+                                                   left_link_name='Prescriptions',
+                                                   left_link_icon=PRESCRIPTION_PAGE_ICON,
+                                                   right_link_page_name=LABORATORY_LIST_PAGE_NAME,
+                                                   right_link_name='Laboratory Results',
+                                                   right_link_icon=LABORATORY_PAGE_ICON,
+                                                   page_icon=PHYSICAL_EXAM_PAGE_ICON,
+                                                   page_title='Physical Exam Results',
+                                                   list_page_name=PHYSICAL_EXAM_LIST_PAGE_NAME)
 
 
 class PhysicalExamSearchListView(GeneralSearchListView):
     def __init__(self, **kwargs):
         super(PhysicalExamSearchListView, self).__init__(PhysicalExam, PHYSICAL_EXAM_PAGE_ICON, 'Physical Exams',
-                                                         reverse_lazy(PHYSICAL_EXAM_SEARCH_LIST_PAGE_NAME),
+                                                         PHYSICAL_EXAM_SEARCH_LIST_PAGE_NAME,
                                                          PHYSICAL_EXAM_SEARCH_LIST_TEMPLATE,
                                                          GENERAL_SEARCH_TYPE_LABEL,
                                                          **kwargs)
-
-    @method_decorator(login_required(login_url=LOGIN_PAGE_NAME))
-    def dispatch(self, request, *args, **kwargs):
-        return super(PhysicalExamSearchListView, self).dispatch(request, *args, **kwargs)
 
 
 class PhysicalExamEditFormView(FormView):
@@ -223,7 +201,6 @@ class PhysicalExamEditFormView(FormView):
                     # Check if there is available data for current Physical Exam Key
                     if form.cleaned_data[field]:
                         values = form.cleaned_data[field]
-                        print(values)
                         physical_exam_detail = PhysicalExamDetail(physical_exam=physical_exam, key=key[0])
                         # Check if value is Iterable and not String before saving
                         if isinstance(values, collections.Iterable) and not isinstance(values, str):

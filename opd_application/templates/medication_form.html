@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+Medication Form - {{ patient }}
+{% endblock %}
+
+{% block page_panel %}
+<div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
+    <form class="form-horizontal" method="post">
+        <fieldset>
+            <legend>
+                Maintenance Medication
+                {% if medication %}
+                    Update
+                {% else %}
+                    Creation
+                {% endif %}
+            </legend>
+        </fieldset>
+        {% if error_message %}
+        <div class="alert alert-danger">
+            {{ error_message }}
+        </div>
+        {% else %}
+        {% endif %}
+        <div class="form-group">
+            <label for="patient_name" class="control-label">
+                Patient Name
+            </label>
+            <div class="controls ">
+                <input class="textinput textInput form-control" id="patient_name"
+                       maxlength="100" name="patient_name" readonly="readonly" type="text"
+                       value="{{ patient }}"/>
+            </div>
+        </div>
+        <input id="patient" name="patient" type="hidden" value="{{ patient.id }}"/>
+        {% if prescription %}
+            <input id="medication" name="medication" type="hidden" value="{{ medication.id }}"/>
+        {% else %}
+        {% endif %}
+        <div class="container-fluid">
+            <div class="row">
+                <h5 class="col-xs-3 text-center">Medicine</h5>
+                <h5 class="col-xs-offset-0-2-5 col-xs-1 text-center">Dosage</h5>
+                <h5 class="col-xs-offset-0-2-5 col-xs-1 text-center">Package</h5>
+                <h5 class="col-xs-offset-0-2-5 col-xs-2 text-center">Frequency</h5>
+                <h5 class="col-xs-offset-0-2-5 col-xs-2 text-center">Designated Time</h5>
+            </div>
+            {{ formset.management_form|crispy }}
+            {% for form in formset %}
+                {% crispy form %}
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            <div class="controls ">
+                <input type="submit" name="submit" value="{{ submit_label }}" class="btn btn-primary"
+                       id="submit-id-submit"/>
+                <input type="submit" name="add" value="Add" class="btn btn-primary" id="submit-id-add"/>
+                {% if formset|length > 1 %}
+                <input type="submit" name="delete" value="Delete" class="btn btn-primary" id="submit-id-delete"/>
+                {% else %}
+                {% endif %}
+                <input type="reset" name="reset" value="Clear" class="btn btn-inverse btn btn-default"
+                       id="reset-id-reset"/>
+                <input type="submit" name="cancel" value="Cancel" class="btn btn-default" id="submit-id-cancel"/>
+            </div>
+        </div>
+    </form>
+    <script type="text/javascript">
+        format_textarea();
+    </script>
+</div>
+{% endblock %}

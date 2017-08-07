@@ -66,3 +66,30 @@
   -webkit-justify-content : center;
           justify-content : center;
 }
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+.major_category {
+    margin: 1em 0em 0em 0em;
+}
+
+/*
+* Class for labels used in a horizontally-aligned form
+*/
+.inline_form_label {
+    text-align: left !important;
+}
+
+/*
+* Class for adding a left margin on medication labels
+*/
+.col-xs-offset-0-5 {
+  margin-left: 4.16666667%;
+}
+.col-xs-offset-0-2-5 {
+  margin-left: 2.08333333%;
+}

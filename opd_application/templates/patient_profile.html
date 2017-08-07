@@ -27,15 +27,15 @@ TODO: add retrieval of patient picture
             </div>
         </div>
         <div class="list-group">
-            <a class="list-group-item" href="{% url 'opd:list_medical' %}?patient={{ patient.id }}">
+            <a class="list-group-item" href="{{ medical_record_list_link }}">
                 <i class="fa fa-list-alt fa-fw"></i>
                 <span class="hidden-xs">&nbsp; Patient Record/s</span>
             </a>
-            <a class="list-group-item" href="#">
+            <a class="list-group-item" href="{{ medical_history_link }}">
                 <i class="fa fa-history fa-fw"></i>
                 <span class="hidden-xs">&nbsp; Medical History</span>
             </a>
-            <a class="list-group-item" href="#">
+            <a class="list-group-item" href="{{ medication_link }}">
                 <i class="fa fa-medkit fa-fw"></i>
                 <span class="hidden-xs">&nbsp; Maintenance Medication/s</span>
             </a>
@@ -87,10 +87,10 @@ TODO: add retrieval of patient picture
         {% if patient.address_country == 'PH' %}
         <span class="row">
             <div class="col-xs-3">
-                <i class="fa fa-home fa-fw fa-2x"></i>
+                <i class="fa fa-phone fa-fw fa-2x"></i>
             </div>
             <div class="col-xs-9">
-                (+63) {{ patient.contact_number }}
+                {{ patient.contact_number }}
             </div>
         </span>
         {% endif %}

@@ -7,20 +7,21 @@
 {% endblock %}
 
 
-<!--
-TODO: add pagination for more than 10 search result
-TODO: edit table css
-TODO: add register patient button link
--->
+{% block nav_links %}
+{% endblock %}
+
 
 {% block top_add_link %}
 <div class="col-xs-3">
 </div>
 {% endblock %}
 
+{% block patient %}
+{% endblock %}
+
 {% block page_sub_panel %}
 <div class="spacer-y-small">
-{% crispy form %}
+    {% crispy form %}
 </div>
 {% if searches %}
 <table class="spacer-y-small table table-responsive table-bordered table-hover">

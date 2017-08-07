@@ -2,11 +2,39 @@
 {% load crispy_forms_tags %}
 
 {% block page_title %}
-Medical History Form
+Medical History Form - {{ patient }}
 {% endblock %}
 
 {% block page_panel %}
 <div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
-    {% crispy form %}
+    <form class="form-horizontal" method="post">
+        <fieldset>
+            <legend>Medical History Creation</legend>
+        </fieldset>
+        <div class="form-group">
+            <label for="patient_name" class="control-label">
+                Patient Name
+            </label>
+            <div class="controls ">
+                <input class="textinput textInput form-control" id="patient_name"
+                       maxlength="100" name="patient_name" readonly="readonly" type="text"
+                       value="{{ patient }}"/>
+            </div>
+        </div>
+        <input id="patient" name="patient" type="hidden" value="{{ patient.id }}"/>
+        {{ formset.management_form|crispy }}
+        {% for form in formset %}
+            {% crispy form %}
+        {% endfor %}
+        <div class="form-group">
+            <div class="controls ">
+                <input type="submit" name="submit" value="Record" class="btn btn-primary"
+                       id="submit-id-submit"/>
+                <input type="reset" name="reset" value="Clear" class="btn btn-inverse btn btn-default"
+                       id="reset-id-reset"/>
+                <input type="submit" name="cancel" value="Cancel" class="btn btn-default" id="submit-id-cancel"/>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}

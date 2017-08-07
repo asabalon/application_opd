@@ -3,58 +3,80 @@
 {% load crispy_forms_tags %}
 
 {% block page_title %}
-Physical Exam Profile - {{ patient }}
+Physical Exam - {{ patient }}
 {% endblock %}
 
 {% block page_panel %}
 <div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
     <nav class="container col-xs-12">
         <ul class="pager">
-            <li class="pull-left"><a href="{{ request.path }}">Previous</a></li>
+            {% if link_dict.prev_link %}
+                <li class="pull-left"><a href="{{ link_dict.prev_link }}">
+            {% else %}
+                <li class="pull-left disabled"><a href="">
+            {% endif %}
+                Previous</a></li>
             <li class=""><a href="{{ physical_exam.medical_record.get_absolute_url }}">Done</a></li>
-            <li class="pull-right"><a href="{{ request.path }}">Next</a></li>
+            {% if link_dict.next_link %}
+                <li class="pull-right"><a href="{{ link_dict.next_link }}">
+            {% else %}
+                <li class="pull-right disabled"><a href="">
+            {% endif %}
+                Next</a></li>
         </ul>
     </nav>
     <h3 class="text-center">
         <i class="fa fa-heartbeat fa-fw fa-1x"></i>
         &nbsp;Physical Exam Detailed Information
     </h3>
-    <ul class="inline col-xs-12" style="">
-        <li class="pull-left">
+    <div class="inline col-xs-12" style="">
+        <div class="col-xs-6">
+            <h5 class="text-left">Record ID:</h5>
+        </div>
+        <div class="col-xs-6">
+            <h5>{{ physical_exam.id }}</h5>
+        </div>
+    </div>
+    <div class="inline col-xs-12" style="">
+        <div class="col-xs-6">
             <h5 class="text-left">Patient Name:</h5>
-        </li>
-        <li class="pull-right">
+        </div>
+        <div class="col-xs-6">
             <h5><a href="{{ patient.get_absolute_url }}">{{ patient }}</a></h5>
-        </li>
-    </ul>
-    <ul class="inline col-xs-12" style="">
-        <li class="pull-left">
+        </div>
+    </div>
+    <div class="inline col-xs-12" style="">
+        <div class="col-xs-6">
             <h5 class="text-left">Recorded Date:</h5>
-        </li>
-        <li class="pull-right">
+        </div>
+        <div class="col-xs-6">
             <h6>{{ physical_exam.recorded_date }}</h6>
-        </li>
-    </ul>
-    <ul class="inline col-xs-12" style="">
-        <li class="pull-left">
+        </div>
+    </div>
+    <div class="inline col-xs-12" style="">
+        <div class="col-xs-6">
             <h5 class="text-left">Recorded By:</h5>
-        </li>
-        <li class="pull-right">
+        </div>
+        <div class="col-xs-6">
             <h6>{{ physical_exam.recorded_by }}</h6>
-        </li>
-    </ul>
+        </div>
+    </div>
     {% for key, details in key_detail_zip %}
-    <ul class="inline col-xs-12" style="">
-        <li class="pull-left">
+    <div class="inline col-xs-12" style="">
+        <div class="col-xs-6">
             <h5 class="text-left">{{ key }}</h5>
-        </li>
-        <li class="pull-right">
+        </div>
+        <div class="col-xs-6">
             {% for detail in details %}
-            <h6>{{ detail }}</h6>
+                {% if detail %}
+                    <h6>{{ detail }}</h6>
+                {% else %}
+                    <h6>N/A</h6>
+                {% endif %}
             {% empty %}
             {% endfor %}
-        </li>
-    </ul>
+        </div>
+    </div>
     {% empty %}
     {% endfor %}
 </div>

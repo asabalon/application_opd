@@ -3,72 +3,138 @@
 {% load crispy_forms_tags %}
 
 {% block page_title %}
+    {{ page_title }} List - {{ patient }}
 {% endblock %}
 
-<!--
-
--->
-
 {% block page_panel %}
-<script src="{% static 'custom/js/search.js' %}"></script>
-<script type="text/javascript" src="{% static 'custom/jquery/base_list.js' %}"></script>
-<div class="col-xs-12 col-md-12 col-lg-offset-2 col-lg-8">
-    {% block nav_links %}
-    {% endblock %}
-
-    <div class="row-fluid vertical-center">
-        <div class="col-xs-9">
-            <div class="row-fluid">
-                <i class="col-xs-3 fa fa-fw fa-2x {{ page_icon }}"></i>
-                <h3 class="col-xs-offset-3">{{ page_title }}</h3>
-            </div>
-        </div>
-        {% block top_add_link %}
-        {% endblock %}
-    </div>
-
-    {% block patient %}
-    {% endblock %}
-
-    {% block page_sub_panel %}
-    {% endblock %}
-
-    {% if searches %}
-    <div class="row-fluid vertical-center">
-        <div class="col-xs-9">
-            <nav class="pull-left">
-                <ul class="pagination">
-                    <li class="{{ previous_link_class }}">
-                        {% if previous_link %}
-                        <a href="{{ previous_link }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
+    <script type="text/javascript" src="{% static 'custom/jquery/base_list.js' %}"></script>
+    <div class="col-xs-12 col-md-12 col-lg-offset-3 col-lg-6">
+        {% block nav_links %}
+            <nav>
+                <ul class="pager">
+                    <li class="pull-left row-fluid vertical-center">
+                        <a href="{{ left_link }}">
+                            <i class="fa fa-1x {{ left_link_icon }}"></i>
+                            {{ left_link_name }}
                         </a>
-                        {% else %}
-                        <span aria-hidden="true">&laquo;</span>
-                        {% endif %}
                     </li>
-                    {% for page in pages %}
-                    {% if page == current_page %}
-                    <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
-                    {% else %}
-                    <li><a href="{{ search_link }}{{ page }}">{{ page }}</a></li>
-                    {% endif %}
-                    {% endfor %}
-                    <li class="{{ next_link_class }}">
-                        {% if next_link %}
-                        <a href="{{ next_link }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
+                    <li class="pull-center">
+                        <a href="{{ center_link }}">
+                            <i class="fa fa-1x {{ center_link_icon }}"></i>
+                            {{ center_link_name }}
                         </a>
-                        {% else %}
-                        <span aria-hidden="true">&raquo;</span>
-                        {% endif %}
+                    </li>
+                    <li class="pull-right">
+                        <a href="{{ right_link }}">
+                            <i class="fa fa-1x {{ right_link_icon }}"></i>
+                            {{ right_link_name }}
+                        </a>
                     </li>
                 </ul>
             </nav>
-        </div>
-        {% block bottom_add_link %}
         {% endblock %}
+
+        <div class="row-fluid vertical-center">
+            <div class="col-xs-9">
+                <div class="row-fluid">
+                    <i class="col-xs-3 fa fa-fw fa-2x {{ page_icon }}"></i>
+                    <h3 class="col-xs-offset-3">{{ page_title }}</h3>
+                </div>
+            </div>
+
+            {% block top_add_link %}
+                <div class="col-xs-3">
+                    <a href="{{ add_link }}" role="button"
+                       class="btn btn-primary pull-right" name="top">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add
+                    </a>
+                </div>
+            {% endblock %}
+
+        </div>
+
+        {% block patient %}
+            <div class="row-fluid vertical-center">
+                <h5 class="col-xs-6">Patient Name:</h5>
+                <h5 class="col-xs-6">
+                    <a class="pull-right" href="{{ patient.get_absolute_url }}">{{ patient }}</a>
+                </h5>
+            </div>
+        {% endblock %}
+
+        {% block page_sub_panel %}
+            {% if searches %}
+                <table class="spacer-y-small table table-responsive table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Encoder</th>
+                        <th>Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for laboratory in searches %}
+                        <tr data-href="{{ laboratory.get_absolute_url }}">
+                            <td scope="row">{{ laboratory.id }}</td>
+                            <td>{{ laboratory.recorded_by }}</td>
+                            <td>{{ laboratory.recorded_date }}</td>
+                        </tr>
+                    {% empty %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-danger">
+                    {{ error_message }}
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        {% if searches %}
+            <div class="row-fluid vertical-center">
+                <div class="col-xs-9">
+                    <nav class="pull-left">
+                        <ul class="pagination">
+                            <li class="{{ previous_link_class }}">
+                                {% if previous_link %}
+                                <a href="{{ previous_link }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                                {% else %}
+                                <span aria-hidden="true">&laquo;</span>
+                                {% endif %}
+                            </li>
+                            {% for page in pages %}
+                            {% if page == current_page %}
+                            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
+                            {% else %}
+                            <li><a href="{{ search_link }}&page={{ page }}">{{ page }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            <li class="{{ next_link_class }}">
+                                {% if next_link %}
+                                <a href="{{ next_link }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                                {% else %}
+                                <span aria-hidden="true">&raquo;</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                {% block bottom_add_link %}
+                    <div class="col-xs-3">
+                        <a href="{{ add_link }}" role="button"
+                           class="btn btn-primary pull-right" name="bottom">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add
+                        </a>
+                    </div>
+                {% endblock %}
+
+            </div>
+        {% endif %}
+
     </div>
-    {% endif %}
-</div>
 {% endblock %}

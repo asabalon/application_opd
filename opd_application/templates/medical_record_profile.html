@@ -27,9 +27,17 @@ TODO: add view diagnosis record (if any)
     </h3>
     <div class="row-fluid vertical-center" style="">
         <div class="col-xs-6 text-left">
+            <h5 class="text-left">Record ID:</h5>
+        </div>
+        <div class="col-xs-6 text-left">
+            {{ medical_record.id }}
+        </div>
+    </div>
+    <div class="row-fluid vertical-center" style="">
+        <div class="col-xs-6 text-left">
             <h5 class="text-left">Patient Name:</h5>
         </div>
-        <div class="col-xs-6 text-right">
+        <div class="col-xs-6 text-left">
             <h5><a href="{{ medical_record.patient.get_absolute_url }}">{{ medical_record.patient }}</a></h5>
         </div>
     </div>
@@ -37,7 +45,7 @@ TODO: add view diagnosis record (if any)
         <div class="col-xs-6 text-left">
             <h5>Recorded Date:</h5>
         </div>
-        <div class="col-xs-6 text-right">
+        <div class="col-xs-6 text-left">
             {{ medical_record.recorded_date }}
         </div>
     </div>
@@ -45,7 +53,7 @@ TODO: add view diagnosis record (if any)
         <div class="col-xs-6 text-left">
             <h5>Recorded By:</h5>
         </div>
-        <div class="col-xs-6 text-right">
+        <div class="col-xs-6 text-left">
             {{ medical_record.recorded_by }}
         </div>
     </div>
@@ -53,7 +61,7 @@ TODO: add view diagnosis record (if any)
         <div class="col-xs-6 text-left">
             <h5>Chief Complaint/s:</h5>
         </div>
-        <div class="col-xs-6 text-right">
+        <div class="col-xs-6 text-left">
             {% for complaint in complaints %}
                 {{ complaint }} <br>
             {% empty %}
@@ -65,7 +73,7 @@ TODO: add view diagnosis record (if any)
         <div class="col-xs-6 text-left">
             <h5>Additional Information:</h5>
         </div>
-        <div class="col-xs-6 text-right">
+        <div class="col-xs-6 text-left">
             {{ medical_record.additional_info }}
         </div>
     </div>
@@ -78,21 +86,21 @@ TODO: add view diagnosis record (if any)
             </a>
         </li>
         <li role="presentation">
-            <a href="#">
+            <a href="{% url 'opd:list_laboratory' %}?medical={{ medical_record.id }}">
                 <i class="fa fa-flask fa-fw fa-1x"></i>
                 &nbsp;Laboratory
                 <span class="badge pull-right">{{ laboratory_count }}</span>
             </a>
         </li>
         <li role="presentation">
-            <a href="#">
+            <a href="{% url 'opd:list_diagnosis' %}?medical={{ medical_record.id }}">
                 <i class="fa fa-stethoscope fa-fw fa-1x"></i>
                 &nbsp;Diagnosis
                 <span class="badge pull-right">{{ diagnosis_count }}</span>
             </a>
         </li>
         <li role="presentation">
-            <a href="#">
+            <a href="{% url 'opd:list_prescription' %}?medical={{ medical_record.id }}">
                 <i class="fa fa-file-text-o fa-fw fa-1x"></i>
                 &nbsp;Prescription
                 <span class="badge pull-right">{{ prescription_count }}</span>

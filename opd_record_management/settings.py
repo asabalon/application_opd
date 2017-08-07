@@ -126,6 +126,10 @@ LOGIN_REDIRECT_URL = '/opd/home'
 # Crispy Forms Required Constants
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
+# Phone Numbers Settings
+PHONENUMBER_DB_FORMAT = 'E164'
+PHONENUMBER_DEFAULT_REGION = 'PH'
+
 # Logging Settings
 LOGGING = {
     # Logging Schema Version (current value is limited to 1)
@@ -139,7 +143,7 @@ LOGGING = {
             'datefmt': '%m/%d/%Y %I:%M:%S %p',
         },
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s',
+            'format': '%(levelname)s %(asctime)s %(module)s %(filename)s %(funcName)s %(process)d %(thread)d %(message)s',
             'datefmt': '%m/%d/%Y %I:%M:%S %p',
         },
         'verbose_db': {
@@ -167,6 +171,7 @@ LOGGING = {
             'filename': os.path.join(os.path.dirname(BASE_DIR),
                                      "logs/" + datetime.date.today().strftime('%d%m%Y') + '-opd.log'),
             'formatter': 'verbose',
+            'filters': ['require_debug_true'],
             'maxBytes': 1024,
         },
         # DEBUG - CRITICAL (DEBUG = TRUE)
@@ -219,7 +224,7 @@ LOGGING = {
         'opd_application': {
             'level': 'DEBUG',
             'filters': [],
-            'handlers': ['console', 'mail_admins', 'file'],
+            'handlers': ['file', 'mail_admins', 'console'],
             'propagate': False,
         }
     }
